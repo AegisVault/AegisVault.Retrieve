@@ -7,29 +7,32 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using AegisVault.Create.Helpers;
+using AegisVault.Models.Inbound;
+using AegisVault.Models.Outbound;
 
 namespace AegisVault.Function
 {
-    public static class GetDocument
+    public class GetDocument
     {
-        [FunctionName("GetDocument")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
+
+        private readonly RetrieveLinkHelper _retrieveLinkHelper;
+        private readonly AegisVaultContext _context;
+
+        public GetDocument(AegisVaultContext context)
+        {
+            _retrieveLinkHelper = new RetrieveLinkHelper(context);
+            _context = context;
+        }
+
+        [FunctionName(nameof(GetLink))]
+        public async Task<IActionResult> GetLink(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "v1/GetLink")] RetrieveLinkInbound body,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            string toReturn = JsonConvert.SerializeObject(await _retrieveLinkHelper.GetLinkPassword(body));
 
-            string name = req.Query["name"];
-
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
-
-            string responseMessage = string.IsNullOrEmpty(name)
-                ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully.";
-
-            return new OkObjectResult(responseMessage);
+            return new OkObjectResult(toReturn);
         }
     }
 }
