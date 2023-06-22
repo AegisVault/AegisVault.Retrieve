@@ -7,32 +7,30 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using AegisVault.Create.Helpers;
 using AegisVault.Models.Inbound;
-using AegisVault.Models.Outbound;
+using AegisVault.Create.Helpers;
+using AegisVault.Retrieve.Models;
 
-namespace AegisVault.Function
+namespace AegisVault.Retrieve.Functions
 {
     public class GetDocument
     {
-
-        private readonly RetrieveLinkHelper _retrieveLinkHelper;
+        private readonly RetrieveHelper _retrieveHelper;
         private readonly AegisVaultContext _context;
 
         public GetDocument(AegisVaultContext context)
         {
-            _retrieveLinkHelper = new RetrieveLinkHelper(context);
+            _retrieveHelper = new RetrieveHelper(context);
             _context = context;
         }
 
-        [FunctionName(nameof(GetLink))]
-        public async Task<IActionResult> GetLink(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "v1/GetLink")] RetrieveLinkInbound body,
+        [FunctionName(nameof(GetDocumentFunction))]
+        public async Task<IActionResult> GetDocumentFunction(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "v2/GetDocument")] RetrieveInbound body,
             ILogger log)
         {
-            string toReturn = JsonConvert.SerializeObject(await _retrieveLinkHelper.GetLinkPassword(body));
-
-            return new OkObjectResult(toReturn);
+            Packa ps = await _retrieveHelper.GetDocumentPassword(body);
+            return new FileStreamResult(ps.Stream, ps.ContentType) { FileDownloadName = ps.DocumentName };
         }
     }
 }
