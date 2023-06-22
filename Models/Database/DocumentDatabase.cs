@@ -12,5 +12,6 @@ namespace AegisVault.Retrieve.Models.Database
         public string Location { get; set; }
         public string Password { get; set; }
         public string ContentType { get; set; }
+        public string DisplayId { get; set; }
     }
 }

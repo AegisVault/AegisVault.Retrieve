@@ -27,7 +27,7 @@ namespace AegisVault.Create.Helpers
 
             var links = _context.Links.ToList();
             var databaseLink = await _context.Links.Where(item =>
-                item.DbId == inboundData.Id &&
+                item.DisplayId == inboundData.DisplayId &&
                 item.Password == inboundData.Password).FirstOrDefaultAsync();
 
             RetrieveLinkOutbound toReturn = new RetrieveLinkOutbound()
@@ -46,7 +46,7 @@ namespace AegisVault.Create.Helpers
 
             var documents = _context.Documents.ToList();
             var databaseDocument = await _context.Documents.Where(item =>
-                item.DbId == inboundData.Id &&
+                item.DisplayId == inboundData.DisplayId &&
                 item.Password == inboundData.Password).FirstOrDefaultAsync();
 
             Packa ps = new Packa();
