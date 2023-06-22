@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using AegisVault.Create.Helpers;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -25,6 +26,7 @@ namespace AegisVault
         
         public override void Configure(IFunctionsHostBuilder builder)
         {
+            builder.Services.AddScoped<HttpContextAccessor>();
             string connectionString = Environment.GetEnvironmentVariable("ConnectionStrings:CosmosDB");
             string connectionStringBackup = "AccountEndpoint=https://aegisvault-db.documents.azure.com:443/;AccountKey=wqeKYoWFGrjcSZ35Xs1xhfjhbaQFSZlIeurEbvHZo7jkQdEYmGHeKjMky3jhz6MlRCK2pk5Jq99jACDb6oPiFw==;";
             builder.Services.AddDbContext<AegisVaultContext>(options => options.UseCosmos(connectionString ?? connectionStringBackup, "AegisVault"));
